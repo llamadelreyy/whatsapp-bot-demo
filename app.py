@@ -50,7 +50,7 @@ def whatsapp_bot():
 
     # INIT state
     if state == "INIT":
-        if incoming_msg == "hello kurauai!":
+        if incoming_msg == "hello":
             user_state[sender] = "MAIN_MENU"
             msg.body(
                 "Assalamualaikum dan Salam Sejahtera!\n\n"
@@ -71,11 +71,11 @@ def whatsapp_bot():
                 "3. Program Semasa"
             )
         else:
-            msg.body("Sila taip: Hello KurauAI!")
+            msg.body("Sila taip: Hello!")
 
     # MAIN_MENU state
     elif state == "MAIN_MENU":
-        if incoming_msg in ["1", "info kuala kurau"]:
+        if incoming_msg in ["1", "info"]:
             user_state[sender] = "INFO_KUALA_KURAU"
             msg.body(
                 "Kuala Kurau ialah pekan nelayan di daerah Kerian, Perak. Terletak di muara Sungai Kurau, "
