@@ -20,9 +20,7 @@ twilio_client = Client(TWILIO_SID, TWILIO_AUTH)
 # Flask app
 app = Flask(__name__)
 
-# Simulated in-memory user state
-user_state = {}
-
+# Countdown messaging function
 def countdown_messages(to_number):
     def send_message(delay, text):
         threading.Timer(delay, lambda: twilio_client.messages.create(
@@ -42,82 +40,48 @@ def whatsapp_bot():
     resp = MessagingResponse()
     msg = resp.message()
 
-    # Initialize user state
-    if sender not in user_state:
-        user_state[sender] = "INIT"
+    # Trigger: "hello"
+    if incoming_msg == "hello":
+        msg.body(
+            "Assalamualaikum dan Salam Sejahtera!\n\n"
+            "Saya Kuala Kurau AI adalah Ejen AI yang dibangunkan khas untuk membantu Komuniti Kuala Kurau.\n\n"
+            "Saya bersedia untuk terus belajar, memahami dan membantu anda mendapatkan pelbagai maklumat berkaitan Kuala Kurau.\n\n"
+            "Teruskan pertanyaan anda sama ada berkaitan:\n"
+            "- Program\n"
+            "- Aktiviti\n"
+            "- Bantuan\n"
+            "- Cuaca\n"
+            "- Aduan\n"
+            "- Talian untuk dihubungi\n\n"
+            "Saya akan cuba memberikan jawapan berdasarkan maklumat yang saya ada.\n\n"
+            "Bersama kita jayakan komuniti digital Kuala Kurau!\n\n"
+            "Sila pilih salah satu di bawah:\n"
+            "1. Info Kuala Kurau\n"
+            "2. Khidmat Bantuan\n"
+            "3. Program Semasa"
+        )
 
-    state = user_state[sender]
+    # Trigger: "info" or "1"
+    elif incoming_msg in ["info", "1"]:
+        msg.body(
+            "Kuala Kurau ialah pekan nelayan di daerah Kerian, Perak. Terletak di muara Sungai Kurau, "
+            "ia terkenal dengan kehidupan kampung yang tenang dan aktiviti perikanan tradisional. "
+            "Tarikan utama termasuk pelayaran sungai, makanan laut segar seperti cucur udang dan telur masin, "
+            "serta pantai Ban Pecah yang indah. Ia juga memiliki kilang padi Hai Hin dan beberapa homestay "
+            "di tengah sawah padi. Lokasinya hanya sejam dari Taiping dan Pulau Pinang, menjadikannya destinasi "
+            "santai yang sesuai untuk percutian ringkas sambil menikmati budaya dan keindahan alam.\n\n"
+            "Adakah anda ingin tahu lebih lanjut berkenaan Kuala Kurau?\n"
+            "1. Ya\n2. Tidak\n3. Kembali ke Laman Utama"
+        )
 
-    # INIT state
-    if state == "INIT":
-        if incoming_msg == "hello":
-            user_state[sender] = "MAIN_MENU"
-            msg.body(
-                "Assalamualaikum dan Salam Sejahtera!\n\n"
-                "Saya Kuala Kurau AI adalah Ejen AI yang dibangunkan khas untuk membantu Komuniti Kuala Kurau.\n\n"
-                "Saya bersedia untuk terus belajar, memahami dan membantu anda mendapatkan pelbagai maklumat berkaitan Kuala Kurau.\n\n"
-                "Teruskan pertanyaan anda sama ada berkaitan:\n"
-                "- Program\n"
-                "- Aktiviti\n"
-                "- Bantuan\n"
-                "- Cuaca\n"
-                "- Aduan\n"
-                "- Talian untuk dihubungi\n\n"
-                "Saya akan cuba memberikan jawapan berdasarkan maklumat yang saya ada.\n\n"
-                "Bersama kita jayakan komuniti digital Kuala Kurau!\n\n"
-                "Sila pilih salah satu di bawah:\n"
-                "1. Info Kuala Kurau\n"
-                "2. Khidmat Bantuan\n"
-                "3. Program Semasa"
-            )
-        else:
-            msg.body("Sila taip: Hello!")
+    # Trigger: "ya" or "1" after info
+    elif incoming_msg in ["ya"]:
+        msg.body("Video akan dimainkan dalam 3 saat.")
+        countdown_messages(sender)
 
-    # MAIN_MENU state
-    elif state == "MAIN_MENU":
-        if incoming_msg in ["1", "info"]:
-            user_state[sender] = "INFO_KUALA_KURAU"
-            msg.body(
-                "Kuala Kurau ialah pekan nelayan di daerah Kerian, Perak. Terletak di muara Sungai Kurau, "
-                "ia terkenal dengan kehidupan kampung yang tenang dan aktiviti perikanan tradisional. "
-                "Tarikan utama termasuk pelayaran sungai, makanan laut segar seperti cucur udang dan telur masin, "
-                "serta pantai Ban Pecah yang indah. Ia juga memiliki kilang padi Hai Hin dan beberapa homestay "
-                "di tengah sawah padi. Lokasinya hanya sejam dari Taiping dan Pulau Pinang, menjadikannya destinasi "
-                "santai yang sesuai untuk percutian ringkas sambil menikmati budaya dan keindahan alam.\n\n"
-                "Adakah anda ingin tahu lebih lanjut berkenaan Kuala Kurau?\n"
-                "1. Ya\n2. Tidak\n3. Kembali ke Laman Utama"
-            )
-        elif incoming_msg == "2":
-            msg.body("Khidmat Bantuan: Sila hubungi 012-3456789 atau layari laman web rasmi.")
-        elif incoming_msg == "3":
-            msg.body("Program Semasa: Pasar Tani setiap Sabtu, Pesta Makanan Laut bulan hadapan.")
-        else:
-            msg.body("Sila pilih 1, 2 atau 3.")
-
-    # INFO_KUALA_KURAU state
-    elif state == "INFO_KUALA_KURAU":
-        if incoming_msg in ["1", "ya"]:
-            user_state[sender] = "VIDEO"
-            msg.body("Video akan dimainkan dalam 3 saat.")
-            countdown_messages(sender)  # Send 3, 2, 1 with delay
-        elif incoming_msg in ["2", "tidak"]:
-            user_state[sender] = "MAIN_MENU"
-            msg.body(
-                "Okay, kembali ke menu utama.\n"
-                "1. Info Kuala Kurau\n2. Khidmat Bantuan\n3. Program Semasa"
-            )
-        elif incoming_msg in ["3", "kembali ke laman utama"]:
-            user_state[sender] = "MAIN_MENU"
-            msg.body(
-                "Laman Utama:\n"
-                "1. Info Kuala Kurau\n2. Khidmat Bantuan\n3. Program Semasa"
-            )
-        else:
-            msg.body("Sila pilih:\n1. Ya\n2. Tidak\n3. Kembali ke Laman Utama")
-
-    # VIDEO state
-    elif state == "VIDEO":
-        msg.body("Terima kasih kerana menggunakan KurauAI!")
+    # Fallback
+    else:
+        msg.body("Sila taip: Hello, Info, atau Ya untuk memulakan interaksi.")
 
     return str(resp)
 
