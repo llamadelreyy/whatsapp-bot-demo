@@ -44,11 +44,17 @@ def whatsapp_bot():
         if incoming_msg == "hello kurauai!":
             user_state[sender] = "MAIN_MENU"
             msg.body(
-                "Selamat datang ke KurauAI!\n\nSila pilih satu:\n"
+                "Assalamualaikum dan Salam Sejahtera YB Chang Lih Kang!\n\n"
+                "Saya Kuala Kurau AI adalah Ejen AI yang dibangunkan khas untuk membantu Komuniti Kuala Kurau.\n\n"
+                "Saya bersedia untuk terus belajar, memahami dan membantu anda mendapatkan pelbagai maklumat berkaitan Kuala Kurau.\n\n"
+                "Saya akan cuba memberikan jawapan berdasarkan maklumat yang saya ada.\n\n"
+                "Bersama kita jayakan komuniti digital Kuala Kurau!\n\n"
+                "Sila pilih salah satu di bawah:\n"
                 "1. Info Kuala Kurau\n"
                 "2. Khidmat Bantuan\n"
                 "3. Program Semasa"
             )
+
         else:
             msg.body("Sila taip: Hello KurauAI!")
 
